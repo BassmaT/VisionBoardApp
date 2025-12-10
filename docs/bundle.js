@@ -2,7 +2,7 @@
 
 const API_BASE = 'http://localhost:5000/api/boards';
 
-export async function createBoard(data) {
+async function createBoard(data) {
   const res = await fetch(API_BASE, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -11,12 +11,12 @@ export async function createBoard(data) {
   return await res.json();
 }
 
-export async function getBoard(id) {
+async function getBoard(id) {
   const res = await fetch(`${API_BASE}/${id}`);
   return await res.json();
 }
 
-export async function addImage(boardId, imageData) {
+async function addImage(boardId, imageData) {
   const res = await fetch(`${API_BASE}/${boardId}/images`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -24,7 +24,7 @@ export async function addImage(boardId, imageData) {
   });
   return await res.json();
 }
-export async function fetchPinterestImages(url) {
+async function fetchPinterestImages(url) {
   const res = await fetch(`http://localhost:5000/api/pinterest?url=${encodeURIComponent(url)}`);
   if (!res.ok) throw new Error('Failed to fetch Pinterest images');
   const data = await res.json();
@@ -32,7 +32,7 @@ export async function fetchPinterestImages(url) {
 }
 
 // frontend/components/app.js
-import { setupForm } from './components/form.js';
+//import { setupForm } from './components/form.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   const formContainer = document.getElementById('formContainer');
@@ -77,10 +77,10 @@ if (!data) {
 }
 
 // frontend/components/form.js
-import { createBoard } from '../api.js';
-import { showImageLabeler } from './imageLabeler.js';
+//import { createBoard } from '../api.js';
+//import { showImageLabeler } from './imageLabeler.js';
 
-export function setupForm(container) {
+function setupForm(container) {
   container.innerHTML = `
     <form id="boardForm">
       <label>
@@ -398,7 +398,7 @@ saveGoalPlansBtn.addEventListener('click', () => {
 }
 // frontend/components/imageLabeler.js
 
-export function showImageLabeler(container, boardData) {
+function showImageLabeler(container, boardData) {
   container.innerHTML = `
     <h2>Assign goals & notes to your images</h2>
 
