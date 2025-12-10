@@ -450,15 +450,10 @@ body.darkmode .goal-plans-content textarea {
   border-color: #ff99cc;
 }
 .back-btn {
-  margin-top: 2rem;
-  padding: 0.6rem 1.2rem;
-  font-size: 1rem;
-  background-color: #ffb6c1;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 100000;
 }
 
 .back-btn:hover {
