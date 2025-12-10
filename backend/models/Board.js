@@ -1,7 +1,7 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
-const boardSchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+const BoardSchema = new mongoose.Schema({
+  owner: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   ownerName: String,
   year: Number,
   goals: [String],
@@ -13,6 +13,6 @@ const boardSchema = new mongoose.Schema({
       notes: String
     }
   ]
-}, { timestamps: true });
+});
 
-export default mongoose.model("Board", boardSchema);
+module.exports = mongoose.model("Board", BoardSchema);

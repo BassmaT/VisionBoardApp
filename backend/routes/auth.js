@@ -1,32 +1,38 @@
-import express from "express";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-import User from "../models/User.js";
+const express = require("express");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const User = require("../models/User");
 
 const router = express.Router();
 
+// REGISTER
 router.post("/register", async (req, res) => {
-  const { email, password } = req.body;
+  const { username, email, password } = req.body;
 
-  const passwordHash = await bcrypt.hash(password, 10);
+  const hashed = await bcrypt.hash(password, 10);
 
-  await User.create({ email, passwordHash });
+  await User.create({
+    username,
+    email,
+    password: hashed
+  });
 
-  res.json({ message: "User created" });
+  res.json({ message: "✅ User registered" });
 });
 
+// LOGIN
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
   const user = await User.findOne({ email });
-  if (!user) return res.status(400).json({ error: "Invalid credentials" });
+  if (!user) return res.status(400).json({ error: "User not found" });
 
-  const valid = await bcrypt.compare(password, user.passwordHash);
-  if (!valid) return res.status(400).json({ error: "Invalid credentials" });
+  const match = await bcrypt.compare(password, user.password);
+  if (!match) return res.status(400).json({ error: "Wrong password" });
 
-  const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
+  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
 
   res.json({ token });
 });
 
-export default router;
+module.exports = router;
