@@ -1,20 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Vision Board</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
+  <!-- Dark Mode Toggle -->
   <button id="darkModeToggle" class="darkmode-btn">🌙</button>
 
+  <!-- Background Glow -->
   <div class="glow-circle"></div>
 
+  <!-- Main Content -->
   <main class="main-wrapper">
     <h1 id="dynamicTitle">Hi … create your vision board here</h1>
     <div id="formContainer"></div>
   </main>
 
-  <!-- Frosted Glass Side Panel -->
+  <!-- Side Panel for Labels -->
   <div id="sidePanel" class="side-panel hidden">
     <div class="side-panel-content">
       <button id="closePanel" class="close-panel-btn">✕</button>
@@ -24,16 +35,25 @@
     </div>
   </div>
 
-  <!-- Hover Popup for Plans -->
+  <!-- Hover Popup -->
   <div id="plansPopup" class="plans-popup hidden"></div>
-  <!-- Popup for adding plans per goal -->
-<div id="goalPlansPopup" class="goal-plans-popup hidden">
-  <div class="goal-plans-content">
-    <h3 id="goalPlansTitle"></h3>
-    <textarea id="goalPlansInput" placeholder="Enter plans, one per line"></textarea>
-    <button type="button" id="saveGoalPlansBtn">Save Plans</button>
-  </div>
-</div>
 
+  <!-- Popup for Plans per Goal -->
+  <div id="goalPlansPopup" class="goal-plans-popup hidden">
+    <div class="goal-plans-content">
+      <h3 id="goalPlansTitle"></h3>
+      <textarea id="goalPlansInput" placeholder="Enter plans, one per line"></textarea>
+      <button type="button" id="saveGoalPlansBtn">Save Plans</button>
+    </div>
+  </div>
+
+  <!-- JS Modules -->
   <script type="module" src="app.js"></script>
+  <script type="module" src="board.js"></script>
+  <script type="module" src="imageLabeler.js"></script>
+  <script type="module" src="modal.js"></script>
+  <script type="module" src="form.js"></script>
+  <script type="module" src="collage.js"></script>
+  <script type="module" src="api.js"></script>
 </body>
+</html>
