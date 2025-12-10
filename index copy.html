@@ -1,0 +1,39 @@
+<head>
+  <meta charset="UTF-8">
+  <title>Vision Board</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <button id="darkModeToggle" class="darkmode-btn">🌙</button>
+
+  <div class="glow-circle"></div>
+
+  <main class="main-wrapper">
+    <h1 id="dynamicTitle">Hi … create your vision board here</h1>
+    <div id="formContainer"></div>
+  </main>
+
+  <!-- Frosted Glass Side Panel -->
+  <div id="sidePanel" class="side-panel hidden">
+    <div class="side-panel-content">
+      <button id="closePanel" class="close-panel-btn">✕</button>
+      <h3>Assign Labels</h3>
+      <div id="panelGoals"></div>
+      <button id="saveImageLabels" class="panel-save-btn">Save</button>
+    </div>
+  </div>
+
+  <!-- Hover Popup for Plans -->
+  <div id="plansPopup" class="plans-popup hidden"></div>
+  <!-- Popup for adding plans per goal -->
+<div id="goalPlansPopup" class="goal-plans-popup hidden">
+  <div class="goal-plans-content">
+    <h3 id="goalPlansTitle"></h3>
+    <textarea id="goalPlansInput" placeholder="Enter plans, one per line"></textarea>
+    <button type="button" id="saveGoalPlansBtn">Save Plans</button>
+  </div>
+</div>
+
+  <script type="module" src="app.js"></script>
+</body>

@@ -1,0 +1,451 @@
+/* -------------------------------------------------------
+   GLOBAL LAYOUT
+------------------------------------------------------- */
+
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: #ffffff;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-y: auto;
+  position: relative;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+.main-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4rem 1rem 6rem;
+  width: 100%;
+  max-width: 800px;
+  z-index: 1;
+  position: relative;
+}
+
+/* -------------------------------------------------------
+   BACKGROUND GLOW
+------------------------------------------------------- */
+
+.glow-circle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1200px;
+  height: 800px;
+  background: radial-gradient(circle at center, #c084fc 0%, #f5bbcc 40%, transparent 80%);
+  transform: translate(-50%, -50%);
+  filter: blur(120px);
+  opacity: 0.5;
+  animation: blobPulse 12s ease-in-out infinite;
+  z-index: 0;
+}
+
+@keyframes blobPulse {
+  0% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+  50% { transform: translate(-50%, -50%) scale(1.08); opacity: 0.6; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+}
+
+/* -------------------------------------------------------
+   TITLE
+------------------------------------------------------- */
+
+h1 {
+  font-size: 2.4rem;
+  color: #fef5f8;
+  margin-bottom: 2rem;
+  font-weight: 600;
+  text-align: center;
+  text-shadow:
+    0 0 6px #f5bbcc,
+    0 0 12px #f5bbcc,
+    0 0 18px #ff99cc,
+    0 0 24px #ff99cc;
+}
+
+/* -------------------------------------------------------
+   FORM CARD
+------------------------------------------------------- */
+
+form {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(14px);
+  border-radius: 24px;
+  box-shadow: 0 10px 40px rgba(255, 182, 193, 0.25);
+  padding: 2rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+  box-sizing: border-box;
+}
+
+/* -------------------------------------------------------
+   INPUTS + LABELS
+------------------------------------------------------- */
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-weight: 500;
+  color: #b8b8b8;
+}
+
+input,
+textarea,
+select {
+  width: 100%;
+  padding: 0.9rem;
+  border: 1.5px solid #f5bbcc;
+  border-radius: 14px;
+  font-size: 1rem;
+  background-color: #fffafc;
+  transition: 0.3s ease;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: #ff99cc;
+  box-shadow: 0 0 8px #ff99cc;
+  outline: none;
+}
+
+/* -------------------------------------------------------
+   BUTTONS
+------------------------------------------------------- */
+
+button {
+  background: #f5bbcc;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.4rem;
+  border-radius: 16px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: 0.3s ease;
+  text-shadow: 0 0 6px #fff;
+  box-shadow: 0 0 12px rgba(255, 182, 193, 0.6);
+}
+
+button:hover {
+  background: #ff99cc;
+  box-shadow: 0 0 16px #ff99cc;
+  transform: translateY(-1px);
+}
+
+/* Center the Select Images button */
+.custom-file-upload {
+  display: block;
+  margin: 0 auto;
+  text-align: center;
+  padding: 0.8rem 1.4rem;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 182, 193, 0.4);
+  color: #d94f8c;
+  cursor: pointer;
+  font-weight: 600;
+  box-shadow: 0 0 12px rgba(255, 182, 193, 0.4);
+  transition: 0.3s ease;
+}
+
+.custom-file-upload:hover {
+  background: rgba(255, 182, 193, 0.45);
+  box-shadow: 0 0 16px rgba(255, 182, 193, 0.6);
+}
+
+/* -------------------------------------------------------
+   GOAL LABELS
+------------------------------------------------------- */
+
+.goal-labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.goal-label {
+  padding: 0.4rem 0.8rem;
+  background: rgba(255, 182, 193, 0.25);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 182, 193, 0.4);
+  color: #d94f8c;
+  font-weight: 500;
+  cursor: default;
+  transition: 0.2s ease;
+}
+
+.goal-label:hover {
+  background: rgba(255, 182, 193, 0.35);
+  transform: scale(1.05);
+}
+
+/* -------------------------------------------------------
+   PLANS POPUP
+------------------------------------------------------- */
+
+.plans-popup {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(14px);
+  border-radius: 14px;
+  padding: 0.8rem 1rem;
+  border: 1px solid rgba(255, 182, 193, 0.4);
+  box-shadow: 0 0 12px rgba(255, 182, 193, 0.4);
+  z-index: 9999;
+  transition: 0.2s ease;
+}
+
+.plans-popup.hidden {
+  opacity: 0;
+  transform: scale(0.95);
+  pointer-events: none;
+}
+
+.plans-popup ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.plans-popup li {
+  font-size: 0.9rem;
+  color: #d94f8c;
+}
+
+/* -------------------------------------------------------
+   IMAGE PREVIEW
+------------------------------------------------------- */
+
+.image-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.preview-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 160px;
+  gap: 0.5rem;
+}
+
+.preview-image {
+  width: 150px;
+  border-radius: 14px;
+  object-fit: cover;
+  border: 1px solid #f5bbcc;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Labels next to image */
+.image-labels {
+  font-size: 0.85rem;
+  color: #d94f8c;
+  font-weight: 500;
+}
+
+/* Notes under image */
+.image-notes {
+  width: 100%;
+  padding: 0.6rem;
+  font-size: 0.85rem;
+  border-radius: 12px;
+  border: 1px solid #f5bbcc;
+  background: #fffafc;
+  box-shadow: 0 0 6px rgba(255, 182, 193, 0.2);
+  font-family: inherit;
+  resize: vertical;
+}
+
+/* -------------------------------------------------------
+   SIDE PANEL
+------------------------------------------------------- */
+
+.side-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 300px;
+  height: 100vh;
+  background: rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(18px);
+  border-left: 1px solid rgba(255, 182, 193, 0.4);
+  box-shadow: -4px 0 20px rgba(255, 182, 193, 0.3);
+  transform: translateX(100%);
+  transition: 0.35s ease;
+  z-index: 9998;
+  padding: 1.4rem;
+}
+
+.side-panel.open {
+  transform: translateX(0);
+}
+
+.side-panel-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.close-panel-btn {
+  align-self: flex-end;
+  background: rgba(255, 182, 193, 0.35);
+  padding: 0.4rem 0.8rem;
+  border-radius: 12px;
+}
+
+/* -------------------------------------------------------
+   DARK MODE
+------------------------------------------------------- */
+
+body.darkmode {
+  background: #1a1a1a;
+  color: #ffe6f0;
+}
+
+body.darkmode form {
+  background: rgba(42, 42, 42, 0.85);
+  box-shadow: 0 10px 40px rgba(255, 182, 193, 0.15);
+}
+
+body.darkmode input,
+body.darkmode textarea {
+  background: #333;
+  color: #ffe6f0;
+  border-color: #ff99cc;
+}
+
+body.darkmode .preview-image {
+  border-color: #ff99cc;
+}
+
+body.darkmode .image-notes {
+  background: #333;
+  border-color: #ff99cc;
+}
+
+body.darkmode .goal-label {
+  background: rgba(255, 182, 193, 0.15);
+  color: #ffb6c1;
+}
+
+body.darkmode .plans-popup {
+  background: rgba(255, 182, 193, 0.15);
+  border-color: #ff99cc;
+}
+
+body.darkmode .side-panel {
+  background: rgba(255, 182, 193, 0.15);
+  border-left-color: #ff99cc;
+}
+.board-wrapper {
+  width: 100%;
+  max-width: 1000px;
+  padding: 3rem 1rem;
+  z-index: 1;
+  position: relative;
+}
+
+.collage {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.2rem;
+  justify-content: center;
+}
+
+.collage-item {
+  position: relative;
+  width: 260px;
+  height: 260px;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(255, 182, 193, 0.4);
+}
+
+.collage-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.collage-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(12px);
+  padding: 1rem;
+  font-size: 0.9rem;
+  color: #d94f8c;
+  opacity: 0;
+  transition: 0.3s ease;
+}
+
+.collage-item:hover .collage-overlay {
+  opacity: 1;
+}
+.goal-plans-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(6px);
+  background: rgba(0,0,0,0.25);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 99999;
+}
+
+.goal-plans-popup.hidden {
+  display: none;
+}
+
+.goal-plans-content {
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(18px);
+  padding: 2rem;
+  border-radius: 20px;
+  width: 350px;
+  box-shadow: 0 0 25px rgba(255, 182, 193, 0.4);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.goal-plans-content textarea {
+  width: 100%;
+  height: 120px;
+  border-radius: 14px;
+  border: 1px solid #f5bbcc;
+  padding: 0.8rem;
+  resize: vertical;
+  background: #fffafc;
+}
+
+body.darkmode .goal-plans-content {
+  background: rgba(255, 182, 193, 0.15);
+  color: #ffe6f0;
+}
+
+body.darkmode .goal-plans-content textarea {
+  background: #333;
+  color: #ffe6f0;
+  border-color: #ff99cc;
+}
