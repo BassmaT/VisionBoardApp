@@ -1,88 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Your Dashboard</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
 
-  <!-- AUTH GUARD -->
+  <!-- Auth Guard -->
   <script>
     if (!localStorage.getItem("token")) {
       window.location.href = "login.html";
     }
   </script>
 
-  <!-- GLOW BACKGROUND -->
+  <!-- Glow Background -->
   <div class="glow-circle"></div>
 
-  <!-- NAVBAR -->
+  <!-- Navbar -->
   <div class="navbar">
-    <button class="nav-home" onclick="window.location.href='index.html'">Home</button>
-    <button class="nav-dashboard" onclick="window.location.href='dashboard.html'">Dashboard</button>
-    <button class="nav-create" onclick="window.location.href='create.html'">New Board</button>
-    <button class="nav-login" onclick="window.location.href='login.html'">Login</button>
-    <button class="nav-register" onclick="window.location.href='register.html'">Register</button>
-    <button class="nav-logout" onclick="logout()">Logout</button>
+    <button onclick="window.location.href='index.html'">Home</button>
+    <button onclick="window.location.href='dashboard.html'">Dashboard</button>
+    <button onclick="window.location.href='create.html'">New Board</button>
+    <button onclick="logout()">Logout</button>
   </div>
 
-  <!-- DARKMODE TOGGLE -->
+  <!-- Darkmode Toggle -->
   <button id="darkModeToggle">🌙</button>
 
-  <!-- DASHBOARD CONTENT -->
+  <!-- Dashboard Content -->
   <div class="dashboard-wrapper">
-    <div class="dashboard-card">
-      <h1 id="dashboardTitle">Hi </h1>
-      <button id="createBoardBtn" class="create-board-btn">Create New Board</button>
-      <button id="viewBoardsBtn" class="view-boards-btn" disabled>View Old Boards</button>
+    <h1 id="dashboardTitle">Hi 👋</h1>
+    <p id="dashboardMessage">Here are your saved boards:</p>
 
-    </div>
-
+    <!-- Boards Grid -->
     <div id="boardsContainer" class="boards-grid"></div>
+
+    <!-- Collage Section -->
+    <div id="collageWrapper" class="board-wrapper hidden">
+      <h2 id="collageTitle"></h2>
+      <div id="collage" class="collage"></div>
+    </div>
   </div>
 
-  <!-- DASHBOARD LOGIC -->
   <script src="dashboard.js"></script>
 
-  <!-- GLOBAL SCRIPT -->
   <script>
     // Darkmode toggle
     const toggle = document.getElementById("darkModeToggle");
     const savedMode = localStorage.getItem("darkmode");
-
     if (savedMode === "on") {
       document.body.classList.add("darkmode");
       toggle.textContent = "☀️";
-    } else {
-      toggle.textContent = "🌙";
     }
-
     toggle.addEventListener("click", () => {
       const isDark = document.body.classList.toggle("darkmode");
       localStorage.setItem("darkmode", isDark ? "on" : "off");
       toggle.textContent = isDark ? "☀️" : "🌙";
     });
 
-    // Logout
     function logout() {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       window.location.href = "login.html";
-    }
-
-    // Navbar visibility
-    const token = localStorage.getItem("token");
-    const loggedInButtons = document.querySelectorAll(".nav-dashboard, .nav-create, .nav-logout");
-    const loggedOutButtons = document.querySelectorAll(".nav-login, .nav-register");
-
-    if (token) {
-      loggedInButtons.forEach(btn => btn.style.display = "inline-block");
-      loggedOutButtons.forEach(btn => btn.style.display = "none");
-    } else {
-      loggedInButtons.forEach(btn => btn.style.display = "none");
-      loggedOutButtons.forEach(btn => btn.style.display = "inline-block");
     }
   </script>
 

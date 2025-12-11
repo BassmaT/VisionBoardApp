@@ -1,19 +1,26 @@
-// State
+// ------------------------------------------------------
+// STATE
+// ------------------------------------------------------
 let goals = [];
-let plans = {};         // { goal: "plan text" }
-let images = [];        // [{ url, note, goal }]
+let plans = {}; 
+let images = []; 
 let currentPlanGoal = null;
 
-// DOM refs
+// ------------------------------------------------------
+// DOM ELEMENTS
+// ------------------------------------------------------
 const goalsList = document.getElementById("goalsList");
 const imageGrid = document.getElementById("imagePreviewGrid");
+
 const planModal = document.getElementById("planModal");
 const planModalTitle = document.getElementById("planModalTitle");
 const planModalTextarea = document.getElementById("planModalTextarea");
 const planModalCancel = document.getElementById("planModalCancel");
 const planModalSave = document.getElementById("planModalSave");
 
-// Generate goal labels
+// ------------------------------------------------------
+// GENERATE GOALS
+// ------------------------------------------------------
 document.getElementById("generateGoalsBtn").addEventListener("click", () => {
   goals = document.getElementById("goalsInput").value
     .split(",")
@@ -22,16 +29,52 @@ document.getElementById("generateGoalsBtn").addEventListener("click", () => {
 
   goalsList.innerHTML = "";
 
-  goals.forEach(goal => {
-    const btn = document.createElement("button");
-    btn.textContent = goal;
-    btn.className = "goal-label";
-    btn.onclick = () => openPlanModal(goal);
-    goalsList.appendChild(btn);
+  goals.forEach((goal, index) => {
+    const wrapper = document.createElement("div");
+    wrapper.className = "goal-label";
+
+    wrapper.innerHTML = `
+      ${goal}
+      <span class="goal-delete" data-index="${index}">✕</span>
+    `;
+
+    wrapper.addEventListener("click", (e) => {
+      if (e.target.classList.contains("goal-delete")) return;
+      openPlanModal(goal);
+    });
+
+    goalsList.appendChild(wrapper);
   });
+
+  // Update goal dropdowns in image cards
+  updateGoalDropdowns();
 });
 
-// Open floating plan modal
+// ------------------------------------------------------
+// DELETE GOAL
+// ------------------------------------------------------
+goalsList.addEventListener("click", (e) => {
+  if (e.target.classList.contains("goal-delete")) {
+    const index = Number(e.target.dataset.index);
+    goals.splice(index, 1);
+    renderGoals();
+    updateGoalDropdowns();
+  }
+});
+
+function renderGoals() {
+  goalsList.innerHTML = "";
+  goals.forEach((goal, index) => {
+    const wrapper = document.createElement("div");
+    wrapper.className = "goal-label";
+    wrapper.innerHTML = `${goal} <span class="goal-delete" data-index="${index}">✕</span>`;
+    goalsList.appendChild(wrapper);
+  });
+}
+
+// ------------------------------------------------------
+// PLAN MODAL
+// ------------------------------------------------------
 function openPlanModal(goal) {
   currentPlanGoal = goal;
   planModalTitle.textContent = `Plans for "${goal}"`;
@@ -39,13 +82,11 @@ function openPlanModal(goal) {
   planModal.classList.remove("hidden");
 }
 
-// Close modal (no save)
 planModalCancel.addEventListener("click", () => {
   planModal.classList.add("hidden");
   currentPlanGoal = null;
 });
 
-// Save plan and close modal
 planModalSave.addEventListener("click", () => {
   if (currentPlanGoal) {
     plans[currentPlanGoal] = planModalTextarea.value.trim();
@@ -54,7 +95,6 @@ planModalSave.addEventListener("click", () => {
   currentPlanGoal = null;
 });
 
-// CLICK OUTSIDE MODAL closes it
 planModal.addEventListener("click", (e) => {
   if (e.target === planModal) {
     planModal.classList.add("hidden");
@@ -62,27 +102,34 @@ planModal.addEventListener("click", (e) => {
   }
 });
 
-// IMAGE UPLOAD (file)
-const imageUploadInput = document.getElementById("imageUpload");
-imageUploadInput.addEventListener("change", (e) => {
+// ------------------------------------------------------
+// IMAGE UPLOAD
+// ------------------------------------------------------
+document.getElementById("imageUpload").addEventListener("change", (e) => {
   [...e.target.files].forEach(file => {
     const url = URL.createObjectURL(file);
     addImagePreview(url);
   });
 });
 
-// IMAGE DROPZONE (optional basic support)
+// ------------------------------------------------------
+// DRAG & DROP
+// ------------------------------------------------------
 const dropzone = document.querySelector(".upload-dropzone");
+
 dropzone.addEventListener("dragover", (e) => {
   e.preventDefault();
   dropzone.classList.add("drag-over");
 });
+
 dropzone.addEventListener("dragleave", () => {
   dropzone.classList.remove("drag-over");
 });
+
 dropzone.addEventListener("drop", (e) => {
   e.preventDefault();
   dropzone.classList.remove("drag-over");
+
   const files = [...e.dataTransfer.files].filter(f => f.type.startsWith("image/"));
   files.forEach(file => {
     const url = URL.createObjectURL(file);
@@ -90,7 +137,9 @@ dropzone.addEventListener("drop", (e) => {
   });
 });
 
-// IMAGE URLs
+// ------------------------------------------------------
+// ADD IMAGE BY URL
+// ------------------------------------------------------
 document.getElementById("addUrlImages").addEventListener("click", () => {
   const urls = document.getElementById("imageUrls").value
     .split("\n")
@@ -101,69 +150,84 @@ document.getElementById("addUrlImages").addEventListener("click", () => {
   document.getElementById("imageUrls").value = "";
 });
 
-// Create image preview card
+// ------------------------------------------------------
+// IMAGE PREVIEW CARD
+// ------------------------------------------------------
 function addImagePreview(url) {
+  const index = images.length;
+
   const wrapper = document.createElement("div");
   wrapper.className = "image-card";
+
   wrapper.innerHTML = `
-    <div class="image-hover">
-      <img src="${url}" class="thumbnail">
-      <div class="overlay">
-        <textarea class="image-note" placeholder="Notes for this image"></textarea>
-        <select class="image-goal-select">
-          <option value="">Assign Goal</option>
-          ${goals.map(g => `<option value="${g}">${g}</option>`).join("")}
-        </select>
-      </div>
+    <button class="remove-img" data-index="${index}">✕</button>
+    <img src="${url}" class="thumbnail">
+    <div class="overlay">
+      <textarea class="image-note" placeholder="Notes"></textarea>
+      <select class="image-goal-select">
+        <option value="">Assign Goal</option>
+        ${goals.map(g => `<option value="${g}">${g}</option>`).join("")}
+      </select>
     </div>
   `;
+
   imageGrid.appendChild(wrapper);
 
-  images.push({
-    url,
-    note: "",
-    goal: ""
+  const imgState = { url, note: "", goal: "" };
+  images.push(imgState);
+
+  wrapper.querySelector(".image-note").addEventListener("input", (e) => {
+    imgState.note = e.target.value;
   });
 
-  const noteTextarea = wrapper.querySelector(".image-note");
-  const goalSelect = wrapper.querySelector(".image-goal-select");
-  const imgState = images[images.length - 1];
-
-  noteTextarea.addEventListener("input", () => {
-    imgState.note = noteTextarea.value;
+  wrapper.querySelector(".image-goal-select").addEventListener("change", (e) => {
+    imgState.goal = e.target.value;
   });
 
-  goalSelect.addEventListener("change", () => {
-    imgState.goal = goalSelect.value;
+  wrapper.querySelector(".remove-img").addEventListener("click", () => {
+    images.splice(index, 1);
+    wrapper.remove();
   });
 }
 
-// FINAL BOARD CREATION
+function updateGoalDropdowns() {
+  document.querySelectorAll(".image-goal-select").forEach(select => {
+    select.innerHTML = `
+      <option value="">Assign Goal</option>
+      ${goals.map(g => `<option value="${g}">${g}</option>`).join("")}
+    `;
+  });
+}
+
+// ------------------------------------------------------
+// CREATE BOARD
+// ------------------------------------------------------
 document.getElementById("createBoardBtn").addEventListener("click", async () => {
   const token = localStorage.getItem("token");
-  const name = document.getElementById("boardName").value.trim();
   const year = document.getElementById("boardYear").value.trim();
   const msg = document.getElementById("createMessage");
 
-  if (!name || !year || goals.length === 0) {
-    msg.textContent = "Please fill name, year and goals before creating.";
+  if (!year || goals.length === 0) {
+    msg.textContent = "Please fill year and goals before creating.";
     msg.style.color = "#d94f8c";
     return;
   }
 
   const boardData = {
-  year,
-  goals,
-  plansByGoal: plans,
-  images: images.map(img => ({
-    src: img.url,
-    labels: img.goal ? [img.goal] : [],
-    notes: img.note || ""
-  }))
-};
+    year: Number(year),
+    goals,
+    plansByGoal: plans,
+    images: images.map(img => ({
+      src: img.url,
+      labels: img.goal ? [img.goal] : [],
+      notes: img.note || ""
+    }))
+  };
+
+  msg.innerHTML = `<div class="loader"></div>`;
 
   try {
-    const res = await fetch("https://visionboardapp.onrender.com/api/boards/create", {
+    const res = await fetch("https://visionboardapp.onrender.com/api/boards", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -172,18 +236,14 @@ document.getElementById("createBoardBtn").addEventListener("click", async () => 
       body: JSON.stringify(boardData)
     });
 
-    const data = await res.json();
-
     if (res.ok) {
       msg.textContent = "✅ Board created!";
       msg.style.color = "#4CAF50";
       setTimeout(() => window.location.href = "dashboard.html", 1200);
     } else {
-      msg.textContent = "❌ Error: " + (data.message || "Something went wrong.");
-      msg.style.color = "#d94f8c";
+      msg.textContent = "❌ Error creating board.";
     }
-  } catch (err) {
-    msg.textContent = "❌ Network error. Try again.";
-    msg.style.color = "#d94f8c";
+  } catch {
+    msg.textContent = "❌ Network error.";
   }
 });

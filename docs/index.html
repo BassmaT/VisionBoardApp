@@ -67,5 +67,18 @@ toggle.addEventListener("click", () => {
   toggle.textContent = isDark ? "☀️" : "🌙";
 });
 </script>
+<script>
+  const token = localStorage.getItem("token");
+  const loggedInButtons = document.querySelectorAll(".nav-dashboard, .nav-create, .nav-logout");
+  const loggedOutButtons = document.querySelectorAll(".nav-login, .nav-register");
+
+  if (token) {
+    loggedInButtons.forEach(btn => btn.style.display = "inline-block");
+    loggedOutButtons.forEach(btn => btn.style.display = "none");
+  } else {
+    loggedInButtons.forEach(btn => btn.style.display = "none");
+    loggedOutButtons.forEach(btn => btn.style.display = "inline-block");
+  }
+</script>
 </body>
 </html>
