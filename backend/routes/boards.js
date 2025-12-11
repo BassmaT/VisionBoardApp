@@ -29,3 +29,9 @@ router.post("/", auth, async (req, res) => {
   res.json(board);
 });
 module.exports = router;
+// Get single board by ID
+router.get("/:id", auth, async (req, res) => {
+  const board = await Board.findOne({ _id: req.params.id, owner: req.userId });
+  if (!board) return res.status(404).json({ message: "Board not found" });
+  res.json(board);
+});

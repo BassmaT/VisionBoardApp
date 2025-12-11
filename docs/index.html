@@ -2,52 +2,70 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Vision Board</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-
-  <!-- Styles -->
+  <title>VisionBoard — Welcome</title>
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-  <!-- Dark Mode Toggle -->
-  <button id="darkModeToggle" class="darkmode-btn">🌙</button>
-
-  <!-- Background Glow -->
+  
+  <!-- Glow background -->
   <div class="glow-circle"></div>
 
-  <!-- Main Content -->
-  <main class="main-wrapper">
-    <h1 id="dynamicTitle">Hi … create your vision board here</h1>
-    <div id="formContainer"></div>
-  </main>
+  <!-- NAVBAR (global) -->
+<div class="navbar">
+  <button class="nav-home" onclick="window.location.href='index.html'">Home</button>
+  <button class="nav-dashboard" onclick="window.location.href='dashboard.html'">Dashboard</button>
+  <button class="nav-create" onclick="window.location.href='create.html'">New Board</button>
+  <button class="nav-login" onclick="window.location.href='login.html'">Login</button>
+  <button class="nav-register" onclick="window.location.href='register.html'">Register</button>
+  <button class="nav-logout" onclick="logout()">Logout</button>
+</div>
 
-  <!-- Side Panel for Labels -->
-  <div id="sidePanel" class="side-panel hidden">
-    <div class="side-panel-content">
-      <button id="closePanel" class="close-panel-btn">✕</button>
-      <h3>Assign Labels</h3>
-      <div id="panelGoals"></div>
-      <button id="saveImageLabels" class="panel-save-btn">Save</button>
+<button id="darkModeToggle">🌙</button>
+
+  <!-- Darkmode toggle, fester Platz -->
+  
+
+  <!-- Landing content (Glass Card) -->
+  <div class="landing-wrapper">
+    <div class="landing-card">
+      <h1>VisionBoard</h1>
+      <p class="landing-subtitle">
+        Turn your goals into visual inspiration. Create soft, dreamy collages that actually mean something to you.
+      </p>
+
+      <div class="landing-actions">
+        <button onclick="window.location.href='login.html'">Login</button>
+        <button onclick="window.location.href='register.html'">Register</button>
+      </div>
+
+      <p class="landing-note">
+        Once you're logged in, you can create new boards, revisit old ones, and track your vision over time.
+      </p>
     </div>
   </div>
 
-  <!-- Hover Popup -->
-  <div id="plansPopup" class="plans-popup hidden"></div>
+  <script>
+ // ✅ Get the toggle button
+const toggle = document.getElementById("darkModeToggle");
 
-  <!-- Popup for Plans per Goal -->
-  <div id="goalPlansPopup" class="goal-plans-popup hidden">
-    <div class="goal-plans-content">
-      <h3 id="goalPlansTitle"></h3>
-      <textarea id="goalPlansInput" placeholder="Enter plans, one per line"></textarea>
-      <button type="button" id="saveGoalPlansBtn">Save Plans</button>
-    </div>
-  </div>
+// ✅ Load saved mode
+const savedMode = localStorage.getItem("darkmode");
 
-  <!-- JS Modules -->
-  <script src="bundle.js"></script>
+if (savedMode === "on") {
+  document.body.classList.add("darkmode");
+  toggle.textContent = "☀️";
+} else {
+  document.body.classList.remove("darkmode");
+  toggle.textContent = "🌙";
+}
+
+// ✅ Toggle mode
+toggle.addEventListener("click", () => {
+  const isDark = document.body.classList.toggle("darkmode");
+  localStorage.setItem("darkmode", isDark ? "on" : "off");
+  toggle.textContent = isDark ? "☀️" : "🌙";
+});
+</script>
 </body>
 </html>

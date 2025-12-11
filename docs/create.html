@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Create Vision Board</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <!-- AUTH GUARD -->
+  <script>
+    if (!localStorage.getItem("token")) {
+      window.location.href = "login.html";
+    }
+  </script>
+
+  <!-- GLOW BACKGROUND -->
+  <div class="glow-circle"></div>
+
+  <!-- NAVBAR -->
+  <div class="navbar">
+    <button class="nav-home" onclick="window.location.href='index.html'">Home</button>
+    <button class="nav-dashboard" onclick="window.location.href='dashboard.html'">Dashboard</button>
+    <button class="nav-create" onclick="window.location.href='create.html'">New Board</button>
+    <button class="nav-login" onclick="window.location.href='login.html'">Login</button>
+    <button class="nav-register" onclick="window.location.href='register.html'">Register</button>
+    <button class="nav-logout" onclick="logout()">Logout</button>
+  </div>
+
+  <!-- DARKMODE TOGGLE -->
+  <button id="darkModeToggle">🌙</button>
+
+  <!-- MAIN WRAPPER -->
+  <div class="dashboard-wrapper create-layout">
+
+    <!-- CARD 1: BOARD INFO & GOALS -->
+    <div class="dashboard-card create-card">
+      <h2>Create Your Vision Board</h2>
+
+      <label>Board Name</label>
+      <input type="text" id="boardName" placeholder="My 2026 Vision">
+
+      <label>Year</label>
+      <input type="number" id="boardYear" placeholder="2026">
+
+      <label>Goals (comma separated)</label>
+      <div class="inline-input-row">
+        <input type="text" id="goalsInput" placeholder="travel, fitness, career">
+        <button id="generateGoalsBtn" class="small-btn">Create labels</button>
+      </div>
+
+      <div id="goalsList" class="goals-list"></div>
+    </div>
+
+    <!-- CARD 2: IMAGES & NOTES -->
+    <div class="dashboard-card create-card">
+      <h2>Add Images & Notes</h2>
+
+      <div class="upload-section">
+        <div class="upload-dropzone">
+          <p>Drag & drop images here</p>
+          <p style="font-size:0.85rem; color:#999;">or</p>
+          <label class="upload-btn">
+            Choose files
+            <input type="file" id="imageUpload" multiple accept="image/*" style="display:none;">
+          </label>
+        </div>
+
+        <div class="upload-urls">
+          <label>Paste Image URLs (one per line)</label>
+          <textarea id="imageUrls" placeholder="https://example.com/image1.jpg"></textarea>
+          <button id="addUrlImages" class="secondary-btn">Add URL Images</button>
+        </div>
+      </div>
+
+      <div id="imagePreviewGrid" class="image-grid"></div>
+    </div>
+
+    <!-- FINAL ACTION -->
+    <div class="create-actions-row">
+      <button id="createBoardBtn" class="create-board-btn">Create Board</button>
+      <p id="createMessage" class="create-message"></p>
+    </div>
+  </div>
+
+  <!-- FLOATING MODAL FOR PLANS -->
+  <div id="planModal" class="plan-modal hidden">
+    <div class="plan-modal-content">
+      <h3 id="planModalTitle">Plans for goal</h3>
+      <textarea id="planModalTextarea" placeholder="Write your detailed plans here..."></textarea>
+      <div class="plan-modal-actions">
+        <button id="planModalCancel" class="secondary-btn">Cancel</button>
+        <button id="planModalSave" class="small-btn">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="create.js"></script>
+
+  <!-- GLOBAL SCRIPT -->
+  <script>
+    const toggle = document.getElementById("darkModeToggle");
+    const savedMode = localStorage.getItem("darkmode");
+
+    if (savedMode === "on") {
+      document.body.classList.add("darkmode");
+      toggle.textContent = "☀️";
+    } else {
+      toggle.textContent = "🌙";
+    }
+
+    toggle.addEventListener("click", () => {
+      const isDark = document.body.classList.toggle("darkmode");
+      localStorage.setItem("darkmode", isDark ? "on" : "off");
+      toggle.textContent = isDark ? "☀️" : "🌙";
+    });
+
+    function logout() {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.location.href = "login.html";
+    }
+
+    const token = localStorage.getItem("token");
+    const loggedInButtons = document.querySelectorAll(".nav-dashboard, .nav-create, .nav-logout");
+    const loggedOutButtons = document.querySelectorAll(".nav-login, .nav-register");
+
+    if (token) {
+      loggedInButtons.forEach(btn => btn.style.display = "inline-block");
+      loggedOutButtons.forEach(btn => btn.style.display = "none");
+    } else {
+      loggedInButtons.forEach(btn => btn.style.display = "none");
+      loggedOutButtons.forEach(btn => btn.style.display = "inline-block");
+    }
+  </script>
+
+</body>
+</html>

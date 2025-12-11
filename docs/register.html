@@ -6,6 +6,17 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  
+    <div class="navbar">
+  <button class="nav-home" onclick="window.location.href='index.html'">Home</button>
+  <button class="nav-dashboard" onclick="window.location.href='dashboard.html'">Dashboard</button>
+  <button class="nav-create" onclick="window.location.href='create.html'">New Board</button>
+  <button class="nav-login" onclick="window.location.href='login.html'">Login</button>
+  <button class="nav-register" onclick="window.location.href='register.html'">Register</button>
+  <button class="nav-logout" onclick="logout()">Logout</button>
+</div>
+
+<button id="darkModeToggle">🌙</button>
 
   <div class="auth-container">
     <h2>Create an Account</h2>
@@ -16,11 +27,34 @@
       <input type="password" id="password" placeholder="Password" required>
 
       <button type="submit">Register</button>
+      
     </form>
 
     <p>Already have an account? <a href="login.html">Login</a></p>
   </div>
 
   <script src="register.js"></script>
+  <script>
+  // ✅ Get the toggle button
+const toggle = document.getElementById("darkModeToggle");
+
+// ✅ Load saved mode
+const savedMode = localStorage.getItem("darkmode");
+
+if (savedMode === "on") {
+  document.body.classList.add("darkmode");
+  toggle.textContent = "☀️";
+} else {
+  document.body.classList.remove("darkmode");
+  toggle.textContent = "🌙";
+}
+
+// ✅ Toggle mode
+toggle.addEventListener("click", () => {
+  const isDark = document.body.classList.toggle("darkmode");
+  localStorage.setItem("darkmode", isDark ? "on" : "off");
+  toggle.textContent = isDark ? "☀️" : "🌙";
+});
+</script>
 </body>
 </html>

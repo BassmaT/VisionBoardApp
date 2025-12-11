@@ -21,6 +21,7 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
 
   // Save token
   localStorage.setItem("token", data.token);
+  localStorage.setItem("user", JSON.stringify(data.user));
 
   // Redirect to dashboard
   window.location.href = "dashboard.html";
