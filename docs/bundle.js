@@ -1,31 +1,51 @@
 // frontend/api.js
 
-const API_BASE = 'http://localhost:5000/api/boards';
+const API_BASE = 'https://visionboardapp.onrender.com/api/boards';
 
 async function createBoard(data) {
+  const token = localStorage.getItem("token");
+
   const res = await fetch(API_BASE, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
     body: JSON.stringify(data)
   });
+
   return await res.json();
 }
 
 async function getBoard(id) {
-  const res = await fetch(`${API_BASE}/${id}`);
+  const token = localStorage.getItem("token");
+
+  const res = await fetch(`${API_BASE}/${id}`, {
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  });
+
   return await res.json();
 }
 
 async function addImage(boardId, imageData) {
+  const token = localStorage.getItem("token");
+
   const res = await fetch(`${API_BASE}/${boardId}/images`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
     body: JSON.stringify(imageData)
   });
+
   return await res.json();
 }
+
 async function fetchPinterestImages(url) {
-  const res = await fetch(`http://localhost:5000/api/pinterest?url=${encodeURIComponent(url)}`);
+  const res = await fetch(`https://visionboardapp.onrender.com/api/pinterest?url=${encodeURIComponent(url)}`);
   if (!res.ok) throw new Error('Failed to fetch Pinterest images');
   const data = await res.json();
   return data.images;
@@ -48,12 +68,33 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-const data = JSON.parse(localStorage.getItem("visionBoardData"));
-const collage = document.getElementById("collage");
+// ✅ Load board from backend instead of localStorage
+async function loadBoard() {
+  const params = new URLSearchParams(window.location.search);
+  const boardId = params.get("id");
+  const collage = document.getElementById("collage");
 
-if (!data) {
-  collage.innerHTML = "<p>No board data found.</p>";
-} else {
+  if (!boardId) {
+    collage.innerHTML = "<p>No board ID found.</p>";
+    return;
+  }
+
+  const token = localStorage.getItem("token");
+
+  const res = await fetch(`https://visionboardapp.onrender.com/api/boards/${boardId}`, {
+    headers: {
+      "Authorization": `Bearer ${token}`
+    }
+  });
+
+  const data = await res.json();
+
+  if (!data || !data.images) {
+    collage.innerHTML = "<p>Board not found.</p>";
+    return;
+  }
+
+  // ✅ Render images
   data.images.forEach(img => {
     const wrapper = document.createElement("div");
     wrapper.classList.add("collage-item");
@@ -75,6 +116,9 @@ if (!data) {
     collage.appendChild(wrapper);
   });
 }
+
+// ✅ Run loader
+loadBoard();
 
 // frontend/components/form.js
 //import { createBoard } from '../api.js';
@@ -389,11 +433,11 @@ saveGoalPlansBtn.addEventListener('click', () => {
     }))
   };
 
-  // ✅ Save board data for the next page
-  localStorage.setItem("visionBoardData", JSON.stringify(boardData));
+ // ✅ Save board to backend
+const savedBoard = await createBoard(boardData);
 
-  // ✅ Redirect to the collage page
-  window.location.href = "board.html";
+// ✅ Redirect to board page with ID
+window.location.href = `board.html?id=${savedBoard._id}`;
 });
 }
 // frontend/components/imageLabeler.js

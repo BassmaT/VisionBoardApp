@@ -19,5 +19,13 @@ router.get("/my", auth, async (req, res) => {
   const boards = await Board.find({ owner: req.userId });
   res.json(boards);
 });
+// Create board
+router.post("/", auth, async (req, res) => {
+  const board = await Board.create({
+    ...req.body,
+    owner: req.userId
+  });
 
+  res.json(board);
+});
 module.exports = router;
