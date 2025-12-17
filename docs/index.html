@@ -7,27 +7,25 @@
 </head>
 
 <body>
-  
+
   <!-- Glow background -->
   <div class="glow-circle"></div>
 
-  <!-- NAVBAR (global) -->
-<div class="navbar">
-  <button class="nav-home" onclick="window.location.href='index.html'">Home</button>
-  <button class="nav-dashboard" onclick="window.location.href='dashboard.html'">Dashboard</button>
-  <button class="nav-create" onclick="window.location.href='create.html'">New Board</button>
-  <button class="nav-login" onclick="window.location.href='login.html'">Login</button>
-  <button class="nav-register" onclick="window.location.href='register.html'">Register</button>
-  <button class="nav-logout" onclick="logout()">Logout</button>
-</div>
+  <!-- NAVBAR -->
+  <div class="navbar">
+    <button class="nav-home" onclick="window.location.href='index.html'">Home</button>
+    <button class="nav-dashboard" onclick="window.location.href='dashboard.html'">Dashboard</button>
+    <button class="nav-create" onclick="window.location.href='create.html'">New Board</button>
+    <button class="nav-login" onclick="window.location.href='login.html'">Login</button>
+    <button class="nav-register" onclick="window.location.href='register.html'">Register</button>
+    <button class="nav-logout" onclick="logout()">Logout</button>
+  </div>
 
-<button id="darkModeToggle">🌙</button>
+  <!-- Darkmode toggle -->
+  <button id="darkModeToggle">🌙</button>
 
-  <!-- Darkmode toggle, fester Platz -->
-  
-
-  <!-- Landing content (Glass Card) -->
-  <div class="landing-wrapper">
+  <!-- GUEST VIEW -->
+  <div id="guestView" class="landing-wrapper">
     <div class="landing-card">
       <h1>VisionBoard</h1>
       <p class="landing-subtitle">
@@ -45,40 +43,147 @@
     </div>
   </div>
 
+  <!-- USER VIEW -->
+  <div id="userView" class="landing-wrapper hidden">
+    <div class="landing-card">
+      <h1>Welcome back 👋</h1>
+      <p class="landing-subtitle">Here’s how to use your Vision Board:</p>
+
+      <ul style="text-align:left; color:#666; margin-bottom:1.5rem;">
+        <li>Create a new vision board </li>
+        <li>Add goals and create a detailed plans for each goal</li>
+        <li>Upload images and assign them to your goals</li>
+        <li>Review and edit your board anytime in the dashboard</li>
+      </ul>
+
+      <div class="landing-actions">
+        <button onclick="window.location.href='dashboard.html'">Dashboard</button>
+        <button onclick="window.location.href='create.html'">New Board</button>
+        <button onclick="logout()">Logout</button>
+      </div>
+
+      <h3 style="margin-top:2rem; color:#d94f8c;">Comments</h3>
+
+<div id="commentsList" class="comments-list"></div>
+
+<textarea id="feedbackBox" placeholder="Write your comment..." style="width:100%; height:100px; border-radius:12px; padding:0.8rem;"></textarea>
+<button onclick="sendComment()" style="margin-top:0.8rem;">Send</button>
+
+<p id="feedbackMsg" style="margin-top:0.8rem; font-weight:600;"></p>
+ </div>
+  </div>
+
+  <!-- DARKMODE SCRIPT -->
   <script>
- // ✅ Get the toggle button
-const toggle = document.getElementById("darkModeToggle");
+    const toggle = document.getElementById("darkModeToggle");
+    const savedMode = localStorage.getItem("darkmode");
 
-// ✅ Load saved mode
-const savedMode = localStorage.getItem("darkmode");
+    if (savedMode === "on") {
+      document.body.classList.add("darkmode");
+      toggle.textContent = "☀️";
+    } else {
+      toggle.textContent = "🌙";
+    }
 
-if (savedMode === "on") {
-  document.body.classList.add("darkmode");
-  toggle.textContent = "☀️";
-} else {
-  document.body.classList.remove("darkmode");
-  toggle.textContent = "🌙";
+    toggle.addEventListener("click", () => {
+      const isDark = document.body.classList.toggle("darkmode");
+      localStorage.setItem("darkmode", isDark ? "on" : "off");
+      toggle.textContent = isDark ? "☀️" : "🌙";
+    });
+  </script>
+
+  <!-- LOGIN STATE LOGIC -->
+  <script>
+    const token = localStorage.getItem("token");
+
+    const guestView = document.getElementById("guestView");
+    const userView = document.getElementById("userView");
+
+    const loggedInButtons = document.querySelectorAll(".nav-dashboard, .nav-create, .nav-logout");
+    const loggedOutButtons = document.querySelectorAll(".nav-login, .nav-register");
+
+    if (token) {
+      // Navbar
+      loggedInButtons.forEach(btn => btn.style.display = "inline-block");
+      loggedOutButtons.forEach(btn => btn.style.display = "none");
+
+      // Views
+      guestView.classList.add("hidden");
+      userView.classList.remove("hidden");
+    } else {
+      loggedInButtons.forEach(btn => btn.style.display = "none");
+      loggedOutButtons.forEach(btn => btn.style.display = "inline-block");
+
+      guestView.classList.remove("hidden");
+      userView.classList.add("hidden");
+    }
+
+    function logout() {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.location.href = "index.html";
+    }
+
+    function sendFeedback() {
+      const msg = document.getElementById("feedbackMsg");
+      msg.textContent = "✅ Feedback sent (UI only)";
+      msg.style.color = "#4CAF50";
+    }
+    
+async function loadComments() {
+  const res = await fetch("https://visionboardapp.onrender.com/api/comments");
+  const comments = await res.json();
+
+  const list = document.getElementById("commentsList");
+  list.innerHTML = "";
+
+  comments.forEach(c => {
+    const div = document.createElement("div");
+    div.className = "comment-card";
+
+    div.innerHTML = `
+      <div class="comment-meta">${c.user} • ${new Date(c.createdAt).toLocaleString()}</div>
+      <div class="comment-text">${c.text}</div>
+    `;
+
+    list.appendChild(div);
+  });
 }
 
-// ✅ Toggle mode
-toggle.addEventListener("click", () => {
-  const isDark = document.body.classList.toggle("darkmode");
-  localStorage.setItem("darkmode", isDark ? "on" : "off");
-  toggle.textContent = isDark ? "☀️" : "🌙";
-});
-</script>
-<script>
+async function sendComment() {
   const token = localStorage.getItem("token");
-  const loggedInButtons = document.querySelectorAll(".nav-dashboard, .nav-create, .nav-logout");
-  const loggedOutButtons = document.querySelectorAll(".nav-login, .nav-register");
+  const text = document.getElementById("feedbackBox").value.trim();
+  const msg = document.getElementById("feedbackMsg");
 
-  if (token) {
-    loggedInButtons.forEach(btn => btn.style.display = "inline-block");
-    loggedOutButtons.forEach(btn => btn.style.display = "none");
-  } else {
-    loggedInButtons.forEach(btn => btn.style.display = "none");
-    loggedOutButtons.forEach(btn => btn.style.display = "inline-block");
+  if (!text) {
+    msg.textContent = "Please write something.";
+    msg.style.color = "#d94f8c";
+    return;
   }
-</script>
+
+  const res = await fetch("https://visionboardapp.onrender.com/api/comments", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    },
+    body: JSON.stringify({ text })
+  });
+
+  if (res.ok) {
+    document.getElementById("feedbackBox").value = "";
+    msg.textContent = "✅ Comment added!";
+    msg.style.color = "#4CAF50";
+    loadComments();
+  } else {
+    msg.textContent = "❌ Failed to send comment.";
+    msg.style.color = "#d94f8c";
+  }
+}
+
+loadComments();
+
+  </script>
+
 </body>
 </html>
