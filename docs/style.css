@@ -1009,3 +1009,36 @@ body.darkmode .image-card .overlay {
 .delete-btn:hover {
   background: #ff3b6a;
 }
+
+.hidden {
+  display: none !important;
+}
+#userView .landing-card ul {
+  padding-left: 1.2rem;
+  line-height: 1.5;
+}
+.comments-list {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.comment-card {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(12px);
+  padding: 1rem;
+  border-radius: 14px;
+  box-shadow: 0 0 12px rgba(255, 182, 193, 0.3);
+}
+
+.comment-meta {
+  font-size: 0.8rem;
+  color: #999;
+  margin-bottom: 0.4rem;
+}
+
+.comment-text {
+  color: #d94f8c;
+  font-size: 1rem;
+}
