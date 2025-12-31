@@ -3,11 +3,26 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const rateLimit = require('express-rate-limit');
+
+// limit repeated requests to auth endpoints
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // limit each IP to 10 requests per windowMs
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: 'Too many requests from this IP, please try again later.' }
+});
 
 // REGISTER
-router.post('/register', async (req, res) => {
+router.post('/register', authLimiter, async (req, res) => {
   try {
     const { username, email, password } = req.body;
+
+    // basic input validation
+    if (!username || !email || !password) {
+      return res.status(400).json({ message: 'username, email and password are required' });
+    }
 
     // Check if user exists
     const existing = await User.findOne({ email });
@@ -25,32 +40,9 @@ router.post('/register', async (req, res) => {
       password: hashed
     });
 
-    // Create token
-   const token = jwt.sign(
-  { id: user._id, username: user.username },
-  process.env.JWT_SECRET,
-  { expiresIn: '7d' }
-);
-    const jwt = require('jsonwebtoken');
-
-module.exports = function (req, res, next) {
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ message: "No token provided" });
-  }
-
-  const token = authHeader.split(" ")[1];
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.userId = decoded.id;
-    req.user = { id: decoded.id, username: decoded.username };
-    next();
-  } catch (err) {
-    return res.status(401).json({ message: "Invalid token" });
-  }
-};
+    // Create token (use fallback only for local/dev)
+    const secret = process.env.JWT_SECRET || 'devsecret';
+    const token = jwt.sign({ id: user._id, username: user.username }, secret, { expiresIn: '7d' });
 
     res.json({
       message: 'User registered successfully',
@@ -69,9 +61,11 @@ module.exports = function (req, res, next) {
 });
 
 // LOGIN
-router.post('/login', async (req, res) => {
+router.post('/login', authLimiter, async (req, res) => {
   try {
     const { email, password } = req.body;
+
+    if (!email || !password) return res.status(400).json({ message: 'email and password required' });
 
     // Find user
     const user = await User.findOne({ email });
@@ -81,10 +75,11 @@ router.post('/login', async (req, res) => {
     const match = await bcrypt.compare(password, user.password);
     if (!match) return res.status(400).json({ message: 'Invalid credentials' });
 
-    // Create token
+    // Create token using same fallback as registration
+    const secret = process.env.JWT_SECRET || 'devsecret';
     const token = jwt.sign(
-      { id: user._id },
-      process.env.JWT_SECRET,
+      { id: user._id, username: user.username },
+      secret,
       { expiresIn: '7d' }
     );
 
@@ -94,10 +89,52 @@ router.post('/login', async (req, res) => {
       user: {
         id: user._id,
         username: user.username,
-        email: user.email
+            email: user.email,
+            name: user.name || '',
+            avatar: user.avatar || ''
       }
     });
 
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Get current user profile
+router.get('/me', require('../middleware/auth'), async (req, res) => {
+  try {
+    const user = await User.findById(req.userId).select('-password');
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json({
+      id: user._id,
+      username: user.username,
+      email: user.email,
+      name: user.name || '',
+      avatar: user.avatar || ''
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Update current user profile
+router.put('/me', require('../middleware/auth'), async (req, res) => {
+  try {
+    const { name, avatar } = req.body;
+    const updates = {};
+    if (typeof name === 'string') updates.name = name.trim();
+    if (typeof avatar === 'string') updates.avatar = avatar.trim();
+
+    const user = await User.findByIdAndUpdate(req.userId, updates, { new: true }).select('-password');
+    res.json({
+      id: user._id,
+      username: user.username,
+      email: user.email,
+      name: user.name || '',
+      avatar: user.avatar || ''
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Server error' });

@@ -31,7 +31,8 @@
   <!-- Dashboard Content -->
   <div class="dashboard-wrapper">
     <h1 id="dashboardTitle">Hi 👋</h1>
-    <p id="dashboardMessage">Here are your saved boards:</p>
+  <p id="dashboardMessage">Here are your saved boards:</p>
+  <button id="refreshBoardsBtn" style="margin-left:1rem;">Refresh</button>
 
     <!-- Boards Grid -->
     <div id="boardsContainer" class="boards-grid"></div>
@@ -44,6 +45,15 @@
   </div>
 
   <script src="dashboard.js"></script>
+  <script src="nav.js"></script>
+
+  <script>
+    document.getElementById('refreshBoardsBtn').addEventListener('click', () => {
+      // allow reload
+      window._boardsLoaded = false;
+      loadBoards();
+    });
+  </script>
 
   <script>
     // Darkmode toggle

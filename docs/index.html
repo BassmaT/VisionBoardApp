@@ -67,9 +67,12 @@
 <div id="commentsList" class="comments-list"></div>
 
 <textarea id="feedbackBox" placeholder="Write your comment..." style="width:100%; height:100px; border-radius:12px; padding:0.8rem;"></textarea>
-<button onclick="sendComment()" style="margin-top:0.8rem;">Send</button>
+<button id="sendCommentBtn" style="margin-top:0.8rem;">Send</button>
 
 <p id="feedbackMsg" style="margin-top:0.8rem; font-weight:600;"></p>
+
+<!-- Simple profile editor -->
+<!-- profile editing moved to profile.html -->
  </div>
   </div>
 
@@ -91,6 +94,7 @@
       toggle.textContent = isDark ? "☀️" : "🌙";
     });
   </script>
+  <script src="nav.js"></script>
 
   <!-- LOGIN STATE LOGIC -->
   <script>
@@ -131,7 +135,8 @@
     }
     
 async function loadComments() {
-  const res = await fetch("https://visionboardapp.onrender.com/api/comments");
+  const API_BASE = window.__API_BASE__ || 'http://127.0.0.1:3000';
+  const res = await fetch(`${API_BASE.replace(/\/$/, '')}/api/comments`);
   const comments = await res.json();
 
   const list = document.getElementById("commentsList");
@@ -141,9 +146,17 @@ async function loadComments() {
     const div = document.createElement("div");
     div.className = "comment-card";
 
+    const avatar = c.avatar || 'https://www.gravatar.com/avatar/?d=mp&f=y';
+    const displayName = c.name || c.user || 'Anonymous';
+
     div.innerHTML = `
-      <div class="comment-meta">${c.user} • ${new Date(c.createdAt).toLocaleString()}</div>
-      <div class="comment-text">${c.text}</div>
+      <div style="display:flex; align-items:center; gap:0.6rem;">
+  <img src="${avatar}" alt="avatar" style="width:44px;height:44px;border-radius:50%;object-fit:cover;" onerror="this.src='https://www.gravatar.com/avatar/?d=mp&f=y'" />
+        <div>
+          <div class="comment-meta">${displayName} • ${new Date(c.createdAt).toLocaleString()}</div>
+          <div class="comment-text">${c.text}</div>
+        </div>
+      </div>
     `;
 
     list.appendChild(div);
@@ -151,6 +164,7 @@ async function loadComments() {
 }
 
 async function sendComment() {
+  const API_BASE = window.__API_BASE__ || 'http://127.0.0.1:3000';
   const token = localStorage.getItem("token");
   const text = document.getElementById("feedbackBox").value.trim();
   const msg = document.getElementById("feedbackMsg");
@@ -161,7 +175,7 @@ async function sendComment() {
     return;
   }
 
-  const res = await fetch("https://visionboardapp.onrender.com/api/comments", {
+  const res = await fetch(`${API_BASE.replace(/\/$/, '')}/api/comments`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -169,6 +183,12 @@ async function sendComment() {
     },
     body: JSON.stringify({ text })
   });
+
+  if (res.status === 401) {
+    msg.textContent = "Please log in to post comments.";
+    msg.style.color = "#d94f8c";
+    return;
+  }
 
   if (res.ok) {
     document.getElementById("feedbackBox").value = "";
@@ -181,7 +201,46 @@ async function sendComment() {
   }
 }
 
+// wire up send button
+document.getElementById('sendCommentBtn').addEventListener('click', sendComment);
+
+// profile editor wiring
+async function loadProfile() {
+  const API_BASE = window.__API_BASE__ || 'http://127.0.0.1:3000';
+  const token = localStorage.getItem('token');
+  if (!token) return;
+  try {
+    const res = await fetch(`${API_BASE.replace(/\/$/, '')}/api/auth/me`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!res.ok) return;
+    const user = await res.json();
+    document.getElementById('profileName').value = user.name || '';
+    document.getElementById('profileAvatar').value = user.avatar || '';
+  } catch (err) { /* ignore */ }
+}
+
+document.getElementById('saveProfileBtn').addEventListener('click', async () => {
+  const API_BASE = window.__API_BASE__ || 'http://127.0.0.1:3000';
+  const token = localStorage.getItem('token');
+  const name = document.getElementById('profileName').value.trim();
+  const avatar = document.getElementById('profileAvatar').value.trim();
+  const msg = document.getElementById('profileMsg');
+  if (!token) { msg.textContent = 'Please log in'; return; }
+  const res = await fetch(`${API_BASE.replace(/\/$/, '')}/api/auth/me`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+    body: JSON.stringify({ name, avatar })
+  });
+  if (res.ok) {
+    msg.textContent = 'Saved'; msg.style.color = '#4CAF50';
+    const u = await res.json();
+    localStorage.setItem('user', JSON.stringify(u));
+  } else { msg.textContent = 'Save failed'; msg.style.color = '#d94f8c'; }
+});
+
 loadComments();
+loadProfile();
 
   </script>
 
