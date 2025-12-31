@@ -227,7 +227,8 @@ document.getElementById("createBoardBtn").addEventListener("click", async () => 
   msg.innerHTML = `<div class="loader"></div>`;
 
   try {
-    const res = await fetch("https://visionboardapp.onrender.com/api/boards", {
+  const API_BASE = window.__API_BASE__ || 'http://127.0.0.1:5050';
+    const res = await fetch(`${API_BASE.replace(/\/$/, '')}/api/boards`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

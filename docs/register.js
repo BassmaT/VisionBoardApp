@@ -1,4 +1,5 @@
-const API_URL = "https://visionboardapp.onrender.com/api/auth/register";
+const API_BASE = window.__API_BASE__ || 'http://127.0.0.1:5050';
+const API_URL = `${API_BASE.replace(/\/$/, '')}/api/auth/register`;
 
 document.getElementById("registerForm").addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -23,7 +24,7 @@ document.getElementById("registerForm").addEventListener("submit", async (e) => 
   // Save token
   localStorage.setItem("token", data.token);
   localStorage.setItem("user", JSON.stringify(data.user));
-
+  if (window.updateNavbarProfile) try { window.updateNavbarProfile(); } catch (e) { }
   // Redirect to dashboard
   window.location.href = "dashboard.html";
 });

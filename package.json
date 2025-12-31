@@ -2,11 +2,12 @@
   "name": "visionboard",
   "version": "1.0.0",
   "description": "Vision Board App",
-  "type": "module",
   "main": "server.js",
   "scripts": {
     "dev": "nodemon backend/server.js",
-    "start": "node backend/server.js"
+    "start": "node backend/server.js",
+    "start:dev": "cd backend && nodemon server.js",
+    "serve-docs": "npx serve docs"
   },
   "keywords": [],
   "author": "",

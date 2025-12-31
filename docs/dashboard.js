@@ -1,4 +1,17 @@
 async function loadBoards() {
+  // prevent concurrent/rapid repeated calls
+  if (window._loadingBoards) {
+    console.debug('loadBoards skipped: already running');
+    return;
+  }
+
+  // prevent repeated automatic reloads: only load once per session unless forced
+  if (window._boardsLoaded) {
+    console.debug('loadBoards skipped: already loaded for this session');
+    return;
+  }
+
+  window._loadingBoards = true;
   const token = localStorage.getItem("token");
   const container = document.getElementById("boardsContainer");
   const title = document.getElementById("dashboardTitle");
@@ -10,19 +23,46 @@ async function loadBoards() {
   }
 
   try {
-    const res = await fetch("https://visionboardapp.onrender.com/api/boards/my", {
+  const API_BASE = window.__API_BASE__ || 'http://127.0.0.1:5050';
+    const res = await fetch(`${API_BASE.replace(/\/$/, '')}/api/boards/my`, {
       headers: { "Authorization": `Bearer ${token}` }
     });
 
-    const boards = await res.json();
+  // debug
+  console.debug('GET /api/boards/my', res.status, res.statusText);
 
-    if (!res.ok || !Array.isArray(boards)) {
-      message.textContent = "❌ Error loading boards.";
+  // prepare UI for a fresh render
+  if (container) container.innerHTML = '';
+  const refreshBtn = document.getElementById('refreshBoardsBtn');
+  if (refreshBtn) refreshBtn.disabled = true;
+
+    // Attempt to parse JSON, but handle non-JSON responses gracefully
+    let boards;
+    try {
+      boards = await res.json();
+    } catch (parseErr) {
+      const text = await res.text().catch(() => 'Unable to read response');
+      console.error('Failed to parse /api/boards/my response as JSON', parseErr, text);
+      message.textContent = `❌ Error loading boards (invalid response).`;
+      return;
+    }
+
+    if (!res.ok) {
+      console.error('Error from API /api/boards/my', res.status, boards);
+      message.textContent = `❌ Error loading boards (status ${res.status}): ${boards.message || JSON.stringify(boards)}`;
+      return;
+    }
+
+    if (!Array.isArray(boards)) {
+      console.error('Unexpected /api/boards/my payload', boards);
+      message.textContent = `❌ Error loading boards (unexpected payload).`;
       return;
     }
 
     if (boards.length === 0) {
       message.textContent = "You don’t have any boards yet.";
+      window._boardsLoaded = true;
+      if (refreshBtn) refreshBtn.disabled = false;
       return;
     }
 
@@ -53,8 +93,16 @@ async function loadBoards() {
       container.appendChild(card);
     });
 
+  // mark loaded to prevent repeated auto-fetch
+  window._boardsLoaded = true;
+  if (refreshBtn) refreshBtn.disabled = false;
+
   } catch (err) {
+    console.error('Network error while loading boards', err);
     message.textContent = "❌ Network error.";
+  } finally {
+    // allow future reloads after a short delay to avoid tight loop
+    setTimeout(() => { window._loadingBoards = false; }, 500);
   }
 }
 
@@ -92,7 +140,8 @@ async function deleteBoard(id, btn, card) {
   btn.disabled = true;
   btn.textContent = "Deleting…";
 
-  const res = await fetch(`https://visionboardapp.onrender.com/api/boards/${id}`, {
+  const API_BASE = window.__API_BASE__ || 'http://127.0.0.1:5050';
+    const res = await fetch(`${API_BASE.replace(/\/$/, '')}/api/boards/${id}`, {
     method: "DELETE",
     headers: { "Authorization": `Bearer ${token}` }
   });
