@@ -1,4 +1,4 @@
-const API_BASE = window.__API_BASE__ || 'http://127.0.0.1:5050';
+const API_BASE = window.__API_BASE__ || 'https://visionboardapp.onrender.com';
 const API_URL = `${API_BASE.replace(/\/$/, '')}/api/auth/register`;
 
 document.getElementById("registerForm").addEventListener("submit", async (e) => {

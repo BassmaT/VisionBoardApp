@@ -1,6 +1,6 @@
 // Use a configurable API base so login works in local dev and production.
 // Default to the local backend so running the docs with a separate static server still calls the API.
-const API_BASE = window.__API_BASE__ || 'http://127.0.0.1:5050';
+const API_BASE = window.__API_BASE__ || 'https://visionboardapp.onrender.com';
 const LOGIN_URL = `${API_BASE.replace(/\/$/, '')}/api/auth/login`;
 
 const form = document.getElementById("loginForm");
