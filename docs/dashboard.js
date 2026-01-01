@@ -23,7 +23,7 @@ async function loadBoards() {
   }
 
   try {
-  const API_BASE = window.__API_BASE__ || 'https://visionboardapp.onrender.com';
+  const API_BASE = 'https://visionboardapp.onrender.com';
     const res = await fetch(`${API_BASE.replace(/\/$/, '')}/api/boards/my`, {
       headers: { "Authorization": `Bearer ${token}` }
     });
@@ -140,7 +140,7 @@ async function deleteBoard(id, btn, card) {
   btn.disabled = true;
   btn.textContent = "Deleting…";
 
-  const API_BASE = window.__API_BASE__ || 'https://visionboardapp.onrender.com';
+  const API_BASE = 'https://visionboardapp.onrender.com';
     const res = await fetch(`${API_BASE.replace(/\/$/, '')}/api/boards/${id}`, {
     method: "DELETE",
     headers: { "Authorization": `Bearer ${token}` }

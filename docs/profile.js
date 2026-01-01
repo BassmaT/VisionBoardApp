@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-  const API_BASE = window.__API_BASE__ || 'https://visionboardapp.onrender.com';
+  const API_BASE = 'https://visionboardapp.onrender.com';
 
   // Ensure user is logged in
   const token = localStorage.getItem('token');
